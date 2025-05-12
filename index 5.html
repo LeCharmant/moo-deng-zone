@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moo-Deng.Zone</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: black;
+      color: #5b1a1a;
+      overflow-x: hidden;
+    }
+
+    .splash {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: white;
+    }
+
+    .splash button {
+      font-size: 2.5rem;
+      padding: 1rem 3rem;
+      border: none;
+      border-radius: 20px;
+      background: #ff5a5a;
+      color: white;
+      cursor: pointer;
+      animation: bounce 1.2s infinite;
+    }
+
+    #volumeControl {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 999;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .main {
+      display: none;
+      padding: 2rem;
+    }
+
+    .section {
+      margin-bottom: 3rem;
+    }
+
+    .memes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+
+    .memes img {
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+
+    .memes img:hover {
+      transform: rotate(-2deg) scale(1.05);
+    }
+
+    @keyframes wave {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(1deg); }
+      50% { transform: rotate(-1deg); }
+      75% { transform: rotate(1deg); }
+      100% { transform: rotate(0deg); }
+    }
+  </style>
+</head>
+<body>
+  <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="1" onchange="adjustVolume(this.value)" />
+  <audio id="bgMusic" loop>
+    <source src="https://files.catbox.moe/05ide4.mp3" type="audio/mp3">
+  </audio>
+
+  <div class="splash" style="background: black; color: white; text-align: center;">
+    <p style="margin-bottom: 1rem; font-size: 1.2rem;">Type the secret phrase to wake him up:</p>
+    <p style="font-size: 1.5rem; color: yellow; font-weight: bold;">Hint: <strong>OOEEA</strong></p>
+    <input type="text" id="secretInput" placeholder="Enter phrase..." style="padding: 0.5rem; font-size: 1rem; border-radius: 10px; border: none;" oninput="checkSecret()" />
+    <div style="position: relative; display: inline-block;">
+      <img src="https://files.catbox.moe/5086hh.gif" alt="Sleeping Moo-Deng" style="width: 35vw; height: auto; margin-bottom: 2rem;" />
+    </div>
+  </div>
+
+  <div class="main" id="mainPage" style="background: white;">
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; height: 100vh; gap: 2rem; position: relative;">
+      <h1 style="font-size: 5rem; color: #000; margin-bottom: 0.5rem; margin-top: -2rem; animation: wave 2s infinite ease-in-out; display: inline-block;">OOEEA-DENG</h1>
+      <img src="https://files.catbox.moe/49li5y.gif" alt="Wake Up Moo-Deng" style="max-width: 100%; max-height: 60vh;">
+      <div style="position: fixed; top: 20px; left: 20px; display: flex; gap: 1rem; z-index: 1000;">
+        <a href="https://x.com/home" target="_blank">
+          <img src="https://files.catbox.moe/xpp62f.png" alt="X" style="width: 60px; height: 60px;">
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const audio = document.getElementById('bgMusic');
+    const volumeSlider = document.getElementById('volumeControl');
+
+    window.addEventListener('DOMContentLoaded', () => {
+      audio.volume = volumeSlider.value;
+      audio.muted = false;
+      audio.play().catch(() => {
+        const tryPlay = () => {
+          audio.play().then(() => {
+            window.removeEventListener('click', tryPlay);
+            window.removeEventListener('keydown', tryPlay);
+          }).catch(err => console.warn("Audio fallback still blocked:", err));
+        };
+        window.addEventListener('click', tryPlay);
+        window.addEventListener('keydown', tryPlay);
+      });
+    });
+
+    function checkSecret() {
+      if (audio.paused) {
+        audio.volume = volumeSlider.value;
+        audio.muted = false;
+        audio.play().catch(err => console.warn("Audio fallback play failed:", err));
+      }
+
+      const input = document.getElementById('secretInput').value.toLowerCase();
+      if (input === 'ooeea') {
+        wakeUp();
+      }
+    }
+
+    function wakeUp() {
+      document.querySelector('.splash').style.display = 'none';
+      document.getElementById('mainPage').style.display = 'block';
+      audio.pause();
+      audio.src = "https://files.catbox.moe/5h9p1e.mp3";
+      audio.load();
+      audio.volume = volumeSlider.value;
+      audio.muted = false;
+      audio.play().catch(err => console.warn("Second track failed to play:", err));
+    }
+
+    function adjustVolume(val) {
+      audio.volume = val;
+    }
+  </script>
+</body>
+</html>
